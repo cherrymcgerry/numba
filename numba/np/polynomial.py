@@ -11,6 +11,36 @@ from numba.core.extending import overload
 from numba.np import numpy_support as np_support
 
 
+@overload(np.polyval)
+def np_polyval(p, x):
+    """Polynomial evaluation of polynomial with coefficients p at variable value x
+
+    Can be used inside i3.CompactModel (calculate_smatrix, calculate_signals, caulcaulte_dydt) to evaluate a polynomial.
+    Can take single variable values but also 1D or multi-dimensional arrays can be evaluated at once.
+
+    Parameters
+    ----------
+
+    p: np.ndarray
+        1D array of polynomial coefficients, from highest degree to the constant term
+    x: np.ndarray, float or int
+         array of values (1D or higher) or a single value for the variable
+
+    Returns
+    -------
+    nd.ndarray or single value, like x
+      with (d)type float if either x or p are of (d)type float
+      or int if both x and p are int.
+    """
+    def polyval(p, x):
+        result = np.ones_like(x) * p[0]
+        for c in p[1:]:
+            result *= x
+            result += c
+        return result
+    return polyval
+
+
 @overload(np.roots)
 def roots_impl(p):
 
